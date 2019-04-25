@@ -2,6 +2,8 @@ from typing import Union
 
 from pyModbusTCP.server import ModbusServer, DataBank
 
+from util.util_logging import log
+
 
 class ModbusInstance:
 
@@ -26,8 +28,8 @@ class ModbusInstance:
     def write(index: int, value: any):
         DataBank.set_words(index, value)
 
-        index = index + 40001
+        index = index + 40001 if index < 40000 else index
         value = value[0] if isinstance(value, list) else value
 
-        print('[Modbus] Wrote %s to index %s' % (value, index))
+        log('[Modbus] Wrote %s to index %s' % (value, index))
 
