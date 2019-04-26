@@ -48,11 +48,12 @@ class DataInterpreter:
 
     def set(self, constant: Enum, value: object, call_event: bool = True):
         self.__data[constant] = value
+
         data_type = constant.value.type
         modbus_ref = constant.value.modbus_ref
         modbus_write = data_type.value[1]
-
         event_handler = self.__change_events.get(constant)
+
         if call_event and event_handler:
             event_handler(constant, value)
 

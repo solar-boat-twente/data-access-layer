@@ -10,4 +10,3 @@ if __name__ == '__main__':
     bridge.open_pipes()
 
     modbus_instance.run(False)
-
