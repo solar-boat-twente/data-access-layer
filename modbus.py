@@ -29,6 +29,7 @@ class ModbusInstance:
     def write_bit(index: int, value: int):
         DataBank.set_bits(index, [value])
         index += 10001
+
         log('[Modbus] Wrote %s to index %s' % (value, index))
 
     @staticmethod

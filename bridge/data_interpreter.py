@@ -44,6 +44,10 @@ class DataInterpreter:
                 self.set(constant, data_value)
 
             except IndexError:
+                default = constant.value.default
+                if default is not None:
+                    self.set(constant, default)
+
                 continue
 
     def set(self, constant: Enum, value: object, call_event: bool = True):
