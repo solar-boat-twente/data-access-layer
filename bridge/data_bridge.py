@@ -1,14 +1,16 @@
 from threading import Thread
-
+from config import config
 from bridge.data_interpreter import DataInterpreter
-from inputs.power_input import PowerInputInterpreter, PowerInputDef
+from inputs.control_data_input import ControlDataInterpreter, ControlDataInputDef
+from inputs.user_power_input import UserPowerInputDef, UserPowerInputInterpreter
 
 
 class DataBridge:
 
     def __init__(self):
         self.__pipes = {
-            'power_input.txt': PowerInputInterpreter(PowerInputDef)
+            #'/home/ronaldboon/NetBeansProjects/Logging/pipes/UserPowerToPython': UserPowerInputInterpreter(UserPowerInputDef),
+            config.PATH_TO_CONTROL_DATA_PIPE: ControlDataInterpreter(ControlDataInputDef)
         }
 
     def open_pipes(self):
@@ -26,10 +28,11 @@ class DataPipe(Thread):
         self.daemon = True
 
     def run(self):
-        with open(self.path, 'r') as file:
-            for line in file:
-                if not line or not line.strip():
-                    continue
+        while True:
+            with open(self.path, 'r') as file:
+                for line in file:
+                    if not line or not line.strip():
+                        continue
 
-                self.interpreter.interpret(line)
+                    self.interpreter.interpret(line)
 
