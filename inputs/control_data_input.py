@@ -19,7 +19,7 @@ class ControlDataInputDef(Enum):
     computed_force_roll = Input(index=8, type=DataType.float, modbus_ref=0)
     computed_force_pitch = Input(index=9, type=DataType.float, modbus_ref=0)
     computed_force_height = Input(index=10, type=DataType.float, modbus_ref=0)
-    computed_angle_left  = Input(index=11, type=DataType.float, modbus_ref=0)
+    computed_angle_left = Input(index=11, type=DataType.float, modbus_ref=0)
     computed_angle_right = Input(index=12, type=DataType.float, modbus_ref=0)
     computed_angle_back = Input(index=13, type=DataType.float, modbus_ref=0)
     #bar = Output(type=DataType.int, modbus_ref=40001)
