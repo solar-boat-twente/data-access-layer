@@ -1,4 +1,4 @@
-from typing import Union
+import struct
 
 from pyModbusTCP.server import ModbusServer, DataBank
 
@@ -22,15 +22,22 @@ class ModbusInstance:
         ModbusInstance.write(index, parsed_text)
 
     @staticmethod
-    def write_num(index: int, value: Union[int, float]):
+    def write_int(index: int, value: int):
         ModbusInstance.write(index, [value])
+
+    @staticmethod
+    def write_float(index: int, value: float):
+        val = str(value).split('.')
+        prefix = val[0]
+        suffix = val[1]
+        suffix = suffix+'0' if len(suffix) == 1 else suffix
+
+        ModbusInstance.write(index, [int('%s%s' % (prefix, suffix))])
 
     @staticmethod
     def write_bit(index: int, value: int):
         DataBank.set_bits(index, [value])
-        index += 10001
-
-        log('[Modbus] Wrote %s to index %s' % (value, index))
+        log('Wrote %s to index %s' % (value, index+10001))
 
     @staticmethod
     def write(index: int, value: any):
@@ -40,5 +47,5 @@ class ModbusInstance:
         value = value[0] if isinstance(value, list) else value
         index += 40001
 
-        log('[Modbus] Wrote %s to index %s' % (value, index))
+        log('Wrote %s to index %s' % (value, index))
 
