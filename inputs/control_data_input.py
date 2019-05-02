@@ -21,9 +21,15 @@ class ControlDataInputDef(Enum):
     computed_angle_left = Input(index=11, type=DataType.float)
     computed_angle_right = Input(index=12, type=DataType.float)
     computed_angle_back = Input(index=13, type=DataType.float)
-    speed = Input(index=14, type=DataType.float, out_type=DataType.int, modbus_ref=40003)
-    real_height = Input(index=15, type=DataType.float, out_type=DataType.int, modbus_ref=40011)
-    real_roll = Input(index=16, type=DataType.float, out_type=DataType.int, modbus_ref=40013)
+    real_height = Input(index=14, type=DataType.float, out_type=DataType.int, modbus_ref=40011)
+    real_roll = Input(index=15, type=DataType.float, out_type=DataType.int, modbus_ref=40013)
+    speed = Input(index=16, type=DataType.float, out_type=DataType.int, modbus_ref=40003)
+    latitude = Input(index=17, type=DataType.float)
+    longitude = Input(index=18, type=DataType.float)
+    current_p = Input(index=19, type=DataType.float)
+    current_i = Input(index=20, type=DataType.float)
+    current_d = Input(index=21, type=DataType.float)
+    current_n = Input(index=22, type=DataType.float)
 
     display_height = Output(DataType.int, modbus_ref=40015)
 
