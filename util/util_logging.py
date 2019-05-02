@@ -1,3 +1,7 @@
+import config
+
+
 def log(message: str, write_to_file: bool = False):
-    # TODO Implement file write log or something
-    print('[DAL] %s' % message)
+    if config.log_to_console:
+        # TODO Implement file write log or something
+        print('[DAL] %s' % message)
