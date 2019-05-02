@@ -28,6 +28,7 @@ class TelemetryInputInputDef(Enum):
 
     advised_speed_min = Output(type=DataType.int, modbus_ref=40004)
     advised_speed_max = Output(type=DataType.int, modbus_ref=40005)
+    connection_status = Output(type=DataType.int, modbus_ref=40012)
 
 
 class TelemetryInputInterpreter(DataInterpreter):
@@ -35,6 +36,7 @@ class TelemetryInputInterpreter(DataInterpreter):
     def __init__(self, enum: Type[Enum]):
         super().__init__(enum)
         self.on_change(TelemetryInputInputDef.advised_speed, self.on_advised_speed_change)
+        self.set(TelemetryInputInputDef.connection_status, 3)
 
     def on_advised_speed_change(self, new_value: int):
         advised_speed_offset = 4

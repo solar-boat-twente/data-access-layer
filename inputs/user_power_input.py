@@ -21,10 +21,10 @@ class UserPowerInputDef(Enum):
     battery_cell_voltage_9 = Input(index=10, type=DataType.float)
     battery_cell_voltage_10 = Input(index=11, type=DataType.float)
     battery_cell_voltage_11 = Input(index=12, type=DataType.float)
-    battery_state_of_charge = Input(index=13, type=DataType.float)
+    battery_state_of_charge = Input(index=13, type=DataType.float, out_type=DataType.int, modbus_ref=40002)
     battery_error_number = Input(index=14, type=DataType.string)
     battery_error_location = Input(index=15, type=DataType.string)
-    battery_max_temp = Input(index=16, type=DataType.string)
+    battery_max_temp = Input(index=16, type=DataType.int, modbus_ref=40007)
     battery_min_temp = Input(index=17, type=DataType.string)
     battery_balance_state = Input(index=18, type=DataType.bit)
     battery_contactor_ready = Input(index=19, type=DataType.bit)
@@ -79,7 +79,7 @@ class UserPowerInputDef(Enum):
     error = Input(index=63, type=DataType.string)
 
     control_pid_state = Input(index=64, type=DataType.string)
-    control_roll = Input(index=65, type=DataType.float)
+    control_roll = Input(index=65, type=DataType.float, out_type=DataType.int, modbus_ref=40014)
 
     buttons_battery_on = Input(index=66, type=DataType.bit)
     buttons_force_battery = Input(index=67, type=DataType.bit)
@@ -96,6 +96,7 @@ class UserPowerInputDef(Enum):
     fly_mode_4 = Output(type=DataType.bit, modbus_ref=3)
     direction_forward = Output(type=DataType.bit, modbus_ref=7)
     direction_backward = Output(type=DataType.bit, modbus_ref=8)
+    battery_temperature_danger = Output(type=DataType.bit, modbus_ref=4)
     driver_temperature_danger = Output(type=DataType.bit, modbus_ref=5)
     motor_temperature_danger = Output(type=DataType.bit, modbus_ref=6)
 
@@ -106,6 +107,9 @@ class UserPowerInputInterpreter(DataInterpreter):
         super().__init__(enum)
         self.on_change(UserPowerInputDef.steer_fly_mode, self.on_fly_mode_change)
         self.on_change(UserPowerInputDef.steer_reverse, self.on_steer_reverse_change)
+        self.on_change(UserPowerInputDef.driver_motor_temp, self.on_motor_temperature_change)
+        self.on_change(UserPowerInputDef.driver_driver_temp, self.on_driver_temperature_change)
+        self.on_change(UserPowerInputDef.battery_max_temp, self.on_battery_temperature_change)
 
     def on_fly_mode_change(self, value: str):
         mapping = {
@@ -131,7 +135,7 @@ class UserPowerInputInterpreter(DataInterpreter):
 
     def on_motor_temperature_change(self, temperature: float):
         min_temp = 10
-        max_temp = 45
+        max_temp = 50
 
         is_safe = min_temp < temperature < max_temp
         self.set(UserPowerInputDef.motor_temperature_danger, int(is_safe))
@@ -141,4 +145,11 @@ class UserPowerInputInterpreter(DataInterpreter):
         max_temp = 50
 
         is_safe = min_temp < temperature < max_temp
-        self.set(UserPowerInputDef.driver_temperature_danger, int(is_safe))
+        self.set(UserPowerInputDef.driver_temperature_danger, int(not is_safe))
+
+    def on_battery_temperature_change(self, temperature: int):
+        min_temp = 10
+        max_temp = 50
+
+        is_safe = min_temp < temperature < max_temp
+        self.set(UserPowerInputDef.battery_temperature_danger, int(not is_safe))
