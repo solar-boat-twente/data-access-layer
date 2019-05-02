@@ -1,7 +1,9 @@
 from enum import Enum
+from typing import Type
 
+from bridge.data_interpreter import DataInterpreter
 from bridge.data_type import DataType
-from util.util_tuple import Input
+from util.util_tuple import Input, Output
 
 
 class TelemetryInputInputDef(Enum):
@@ -22,4 +24,23 @@ class TelemetryInputInputDef(Enum):
     solar_panel_state_7 = Input(index=13, type=DataType.bit)
     solar_panel_state_8 = Input(index=14, type=DataType.bit)
     solar_panel_state_9 = Input(index=15, type=DataType.bit)
-    advised_speed = Input(index=16, type=DataType.float)
+    advised_speed = Input(index=16, type=DataType.float, out_type=DataType.int, modbus_ref=40006)
+
+    advised_speed_min = Output(type=DataType.int, modbus_ref=40004)
+    advised_speed_max = Output(type=DataType.int, modbus_ref=40005)
+
+
+class TelemetryInputInterpreter(DataInterpreter):
+
+    def __init__(self, enum: Type[Enum]):
+        super().__init__(enum)
+        self.on_change(TelemetryInputInputDef.advised_speed, self.on_advised_speed_change)
+
+    def on_advised_speed_change(self, new_value: int):
+        advised_speed_offset = 4
+
+        min_speed = new_value - advised_speed_offset if new_value >= advised_speed_offset else 0
+        max_speed = new_value + advised_speed_offset if new_value + advised_speed_offset <= 50 else 50
+
+        self.set(TelemetryInputInputDef.advised_speed_min, min_speed)
+        self.set(TelemetryInputInputDef.advised_speed_max, max_speed)

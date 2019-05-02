@@ -53,7 +53,7 @@ class DataInterpreter:
     def set(self, constant: Enum, value: object, call_event: bool = True):
         self.__data[constant] = value
 
-        data_type = constant.value.type
+        data_type = constant.value.out_type or constant.value.type
         modbus_ref = constant.value.modbus_ref
         modbus_write = data_type.value[1]
         event_handler = self.__change_events.get(constant)
@@ -63,14 +63,14 @@ class DataInterpreter:
 
         if modbus_ref is not None and modbus_write:
             from app import modbus_instance
-            getattr(modbus_instance, modbus_write)(modbus_ref, value)
+            getattr(modbus_instance, modbus_write)(value)
 
         log('Updated attribute %s with value %s' % (constant.name, value))
 
     def get(self, constant: Enum) -> object:
         return self.__data.get(constant)
 
-    def on_change(self, constant: Enum, callback: Callable[[Enum, object], None]):
+    def on_change(self, constant: Enum, callback: Callable[[object], None]):
         self.__change_events[constant] = callback
 
     def __flush(self):

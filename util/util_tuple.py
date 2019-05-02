@@ -13,5 +13,5 @@ def nullable_namedtuple(typename, field_names, default_values=()):
     return T
 
 
-Input = nullable_namedtuple('Input', 'index type modbus_ref default')
+Input = nullable_namedtuple('Input', 'index type modbus_ref default out_type')
 Output = nullable_namedtuple('Output', 'type modbus_ref')

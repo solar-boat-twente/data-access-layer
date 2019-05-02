@@ -1,7 +1,9 @@
 from enum import Enum
+from typing import Type
 
+from bridge.data_interpreter import DataInterpreter
 from bridge.data_type import DataType
-from util.util_tuple import Input
+from util.util_tuple import Input, Output
 
 
 class UserPowerInputDef(Enum):
@@ -87,3 +89,40 @@ class UserPowerInputDef(Enum):
     steer_raw_throttle = Input(index=70, type=DataType.string)
     steer_fly_mode = Input(index=71, type=DataType.string)
     steer_reverse = Input(index=72, type=DataType.bit)
+
+    fly_mode_1 = Output(type=DataType.bit, modbus_ref=0)
+    fly_mode_2 = Output(type=DataType.bit, modbus_ref=1)
+    fly_mode_3 = Output(type=DataType.bit, modbus_ref=2)
+    fly_mode_4 = Output(type=DataType.bit, modbus_ref=3)
+    direction_forward = Output(type=DataType.bit, modbus_ref=7)
+    direction_backward = Output(type=DataType.bit, modbus_ref=8)
+
+
+class UserPowerInterpreter(DataInterpreter):
+
+    def __init__(self, enum: Type[Enum]):
+        super().__init__(enum)
+        self.on_change(UserPowerInputDef.steer_fly_mode, self.on_fly_mode_change)
+        self.on_change(UserPowerInputDef.steer_reverse, self.on_steer_reverse_change)
+
+    def on_fly_mode_change(self, value: str):
+        mapping = {
+            'FLY': UserPowerInputDef.fly_mode_4,
+            'Bridge': UserPowerInputDef.fly_mode_3,
+            'NO_FLY': UserPowerInputDef.fly_mode_2,
+            'Slalom': UserPowerInputDef.fly_mode_1
+        }
+
+        def set_bit(definition: Enum, enum: Enum):
+            self.set(enum, 1 if definition == enum else 0)
+
+        mapped_def = mapping.get(value)
+        if mapped_def:
+            set_bit(mapped_def, UserPowerInputDef.fly_mode_1)
+            set_bit(mapped_def, UserPowerInputDef.fly_mode_2)
+            set_bit(mapped_def, UserPowerInputDef.fly_mode_3)
+            set_bit(mapped_def, UserPowerInputDef.fly_mode_4)
+
+    def on_steer_reverse_change(self, is_backwards: int):
+        self.set(UserPowerInputDef.direction_forward, int(not is_backwards))
+        self.set(UserPowerInputDef.direction_backward, is_backwards)
