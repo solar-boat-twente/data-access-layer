@@ -21,6 +21,7 @@ class ModbusInstance:
 
     @staticmethod
     def write_int(index: int, value: int):
+        value = int(round(value))
         ModbusInstance.write(index, [value])
 
     @staticmethod

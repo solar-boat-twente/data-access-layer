@@ -52,8 +52,8 @@ class UserPowerInputDef(Enum):
     solar_panels_panel_power_8 = Input(index=39, type=DataType.float)
     solar_panels_panel_power_9 = Input(index=40, type=DataType.float)
 
-    driver_motor_temp = Input(index=41, type=DataType.float)
-    driver_driver_temp = Input(index=42, type=DataType.float)
+    driver_motor_temp = Input(index=41, type=DataType.float, out_type=DataType.int, modbus_ref=40008)
+    driver_driver_temp = Input(index=42, type=DataType.float, out_type=DataType.int, modbus_ref=40009)
     buttons_deadmans_switch = Input(index=43, type=DataType.bit)
     driver_driver_output_power = Input(index=44, type=DataType.float)
     driver_motor_speed = Input(index=45, type=DataType.float)
@@ -96,9 +96,11 @@ class UserPowerInputDef(Enum):
     fly_mode_4 = Output(type=DataType.bit, modbus_ref=3)
     direction_forward = Output(type=DataType.bit, modbus_ref=7)
     direction_backward = Output(type=DataType.bit, modbus_ref=8)
+    driver_temperature_danger = Output(type=DataType.bit, modbus_ref=5)
+    motor_temperature_danger = Output(type=DataType.bit, modbus_ref=6)
 
 
-class UserPowerInterpreter(DataInterpreter):
+class UserPowerInputInterpreter(DataInterpreter):
 
     def __init__(self, enum: Type[Enum]):
         super().__init__(enum)
@@ -126,3 +128,17 @@ class UserPowerInterpreter(DataInterpreter):
     def on_steer_reverse_change(self, is_backwards: int):
         self.set(UserPowerInputDef.direction_forward, int(not is_backwards))
         self.set(UserPowerInputDef.direction_backward, is_backwards)
+
+    def on_motor_temperature_change(self, temperature: float):
+        min_temp = 10
+        max_temp = 45
+
+        is_safe = min_temp < temperature < max_temp
+        self.set(UserPowerInputDef.motor_temperature_danger, int(is_safe))
+
+    def on_driver_temperature_change(self, temperature: float):
+        min_temp = 10
+        max_temp = 50
+
+        is_safe = min_temp < temperature < max_temp
+        self.set(UserPowerInputDef.driver_temperature_danger, int(is_safe))
