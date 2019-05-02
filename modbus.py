@@ -1,5 +1,3 @@
-import struct
-
 from pyModbusTCP.server import ModbusServer, DataBank
 
 from util.util_logging import log

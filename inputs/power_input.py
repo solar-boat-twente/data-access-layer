@@ -16,7 +16,9 @@ class PowerInputDef(Enum):
     battery_temp = Input(index=5, type=DataType.int, modbus_ref=40007)
     motor_temp = Input(index=6, type=DataType.int, modbus_ref=40008)
     driver_temp = Input(index=7, type=DataType.int, modbus_ref=40009)
-    height = Input(index=8, type=DataType.float, modbus_ref=40011)
+    height = Input(index=8, type=DataType.int, modbus_ref=40011)
+    direction_forward = Input(index=9, type=DataType.bit, modbus_ref=7)
+    direction_backward = Input(index=10, type=DataType.bit, modbus_ref=8)
 
     mode_text = Output(type=DataType.string, modbus_ref=40010)  # TODO CHANGE THIS WHEN MODE NUMBER CHANGES
     mode_1_active = Output(type=DataType.bit, modbus_ref=0)     # TODO CHANGE THIS WHEN MODE NUMBER CHANGES
