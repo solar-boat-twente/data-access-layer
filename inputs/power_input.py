@@ -31,16 +31,19 @@ class PowerInputDef(Enum):
     motor_danger = Output(type=DataType.bit, modbus_ref=6)      # TODO CHANGE THIS WHEN MOTOR TEMP. CHANGES
     connection_status = Output(type=DataType.int, modbus_ref=40012)
 
+    current_roll = Input(index=21, type=DataType.int, modbus_ref=40013, default=40)
+    set_roll = Input(index=20, type=DataType.int, modbus_ref=40014, default=33)
+
 
 class PowerInputInterpreter(DataInterpreter):
 
     def __init__(self, enum: Type[Enum]):
         super().__init__(enum)
-        self.set(PowerInputDef.mode_1_active, 1)
+        self.set(PowerInputDef.mode_1_active, 0)
         self.set(PowerInputDef.mode_2_active, 0)
         self.set(PowerInputDef.mode_3_active, 0)
-        self.set(PowerInputDef.mode_4_active, 0)
+        self.set(PowerInputDef.mode_4_active, 1)
         self.set(PowerInputDef.battery_danger, 0)
-        self.set(PowerInputDef.driver_danger, 0)
+        self.set(PowerInputDef.driver_danger, 1)
         self.set(PowerInputDef.motor_danger, 0)
-        self.set(PowerInputDef.connection_status, 2)
+        self.set(PowerInputDef.connection_status, 0)
