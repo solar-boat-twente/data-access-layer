@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Type, Callable
 
+from data_to_web_app.web_app_data import web_app_data
 from util.util_logging import log
 from util.util_tuple import Input
 
@@ -53,13 +54,10 @@ class DataInterpreter:
     def set(self, constant: Enum, value: object, call_event: bool = True):
         self.__data[constant] = value
 
-        if isinstance(constant.value, Input):
-            data_type = constant.value.out_type or constant.value.type
-        else:
-            data_type = constant.value.type
-
+        data_type = constant.value.out_type or constant.value.type
         modbus_ref = constant.value.modbus_ref
         modbus_write = data_type.value[1]
+        to_web_app = data_type.value.to_web_app
         event_handler = self.__change_events.get(constant)
 
         if call_event and event_handler:
@@ -67,7 +65,11 @@ class DataInterpreter:
 
         if modbus_ref is not None and modbus_write:
             from app import modbus_instance
-            getattr(modbus_instance, modbus_write)(modbus_ref, value)
+            getattr(modbus_instance, modbus_write)(value)
+
+        if to_web_app is True:
+            getattr(web_app_data, constant.name)(value)
+            log("Wrote value %s to web app instance %s" % (constant.name, value))
 
         log('Updated attribute %s with value %s' % (constant.name, value))
 

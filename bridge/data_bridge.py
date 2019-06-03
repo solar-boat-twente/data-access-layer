@@ -32,10 +32,14 @@ class DataPipe(Thread):
 
     def run(self):
         while True:
-            with open(self.path, 'r') as file:
+            with open(self.path, 'r+') as file:
                 for line in file:
                     if not line or not line.strip():
                         continue
 
                     self.interpreter.interpret(line)
+                    file.write("")
+                    file.close()
+            #clean_pipe(self.path)
+
 
